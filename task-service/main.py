@@ -25,8 +25,6 @@ class Task(Base):
     created_by  = Column(String, nullable=False)
     created_at  = Column(DateTime, default=datetime.utcnow)
 
-Base.metadata.create_all(bind=engine)
-
 def get_db():
     db = SessionLocal()
     try:
@@ -46,6 +44,10 @@ class TaskUpdate(BaseModel):
 
 class AssignRequest(BaseModel):
     assigned_to: str
+
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
 
 @app.get("/health")
 def health():
