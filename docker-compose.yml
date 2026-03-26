@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: taskflow-db
+    environment:
+      POSTGRES_USER: taskuser
+      POSTGRES_PASSWORD: taskpass
+      POSTGRES_DB: taskflow
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskuser -d taskflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  user-service:
+    build: ./user-service
+    container_name: taskflow-user
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgresql://taskuser:taskpass@postgres:5432/taskflow
+      SECRET_KEY: supersecretkey123
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  task-service:
+    build: ./task-service
+    container_name: taskflow-task
+    ports:
+      - "8002:8002"
+    environment:
+      DATABASE_URL: postgresql://taskuser:taskpass@postgres:5432/taskflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  notification-service:
+    build: ./notification-service
+    container_name: taskflow-notify
+    ports:
+      - "8005:8003"
+
+volumes:
+  pgdata:
