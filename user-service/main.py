@@ -80,3 +80,7 @@ def get_user(user_id: str, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return {"id": user.id, "username": user.username, "email": user.email}
+
+
+from prometheus_fastapi_instrumentator import Instrumentator
+Instrumentator().instrument(app).expose(app)

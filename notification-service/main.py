@@ -36,3 +36,7 @@ def get_notifications(user_id: str):
     if not user_notifications:
         return {"message": "No notifications found", "notifications": []}
     return {"user_id": user_id, "notifications": user_notifications}
+
+
+from prometheus_fastapi_instrumentator import Instrumentator
+Instrumentator().instrument(app).expose(app)

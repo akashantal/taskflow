@@ -107,3 +107,7 @@ def assign_task(task_id: str, req: AssignRequest, db: Session = Depends(get_db))
     task.status = "assigned"
     db.commit()
     return {"message": f"Task assigned to {req.assigned_to}"}
+
+
+from prometheus_fastapi_instrumentator import Instrumentator
+Instrumentator().instrument(app).expose(app)
